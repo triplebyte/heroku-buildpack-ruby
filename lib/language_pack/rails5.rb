@@ -56,4 +56,11 @@ class LanguagePack::Rails5 < LanguagePack::Rails42
     @cache.store webpacker_assets_folder
     @cache.store webpacker_assets_cache
   end
+
+  def cleanup_assets_cache
+    instrument "rails5.cleanup_assets_cache" do
+      LanguagePack::Helpers::StaleFileCleaner.new(webpacker_assets_cache).clean_over(ASSETS_CACHE_LIMIT)
+      LanguagePack::Helpers::StaleFileCleaner.new(default_assets_cache).clean_over(ASSETS_CACHE_LIMIT)
+    end
+  end
 end
