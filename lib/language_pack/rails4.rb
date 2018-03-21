@@ -79,8 +79,7 @@ WARNING
 
         topic("Preparing app for Rails asset pipeline")
 
-        @cache.load_without_overwrite public_assets_folder
-        @cache.load default_assets_cache
+        load_assets_cache
 
         precompile.invoke(env: rake_env)
 
@@ -92,13 +91,22 @@ WARNING
           rake.task("assets:clean").invoke(env: rake_env)
 
           cleanup_assets_cache
-          @cache.store public_assets_folder
-          @cache.store default_assets_cache
+          save_assets_cache
         else
           precompile_fail(precompile.output)
         end
       end
     end
+  end
+
+  def load_assets_cache
+    @cache.load_without_overwrite public_assets_folder
+    @cache.load default_assets_cache
+  end
+
+  def save_assets_cache
+    @cache.store public_assets_folder
+    @cache.store default_assets_cache
   end
 
   def cleanup_assets_cache

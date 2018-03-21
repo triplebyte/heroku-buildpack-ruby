@@ -27,7 +27,27 @@ class LanguagePack::Rails5 < LanguagePack::Rails42
     })
   end
 
+  def webpacker_assets_folder
+    "public/packs"
+  end
+
+  def webpacker_assets_cache
+    "tmp/cache/webpacker"
+  end
+
   def install_plugins
     # do not install plugins, do not call super, do not warn
+  end
+
+  def load_assets_cache
+    super
+    @cache.load_without_overwrite webpacker_assets_folder
+    @cache.load webpacker_assets_folder
+  end
+
+  def save_assets_cache
+    super
+    @cache.store webpacker_assets_folder
+    @cache.store webpacker_assets_cache
   end
 end
