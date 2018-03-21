@@ -57,6 +57,11 @@ class LanguagePack::Rails5 < LanguagePack::Rails42
     @cache.store webpacker_assets_cache
   end
 
+  def clear_assets_if_oversize
+    super
+    topic('Cleared cached packs') if @cache.clear_if_oversize(webpacker_assets_folder, 1024)
+  end
+
   def cleanup_assets_cache
     instrument "rails5.cleanup_assets_cache" do
       LanguagePack::Helpers::StaleFileCleaner.new([

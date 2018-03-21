@@ -79,6 +79,7 @@ WARNING
 
         topic("Preparing app for Rails asset pipeline")
 
+        clear_assets_cache_if_oversize
         load_assets_cache
 
         precompile.invoke(env: rake_env)
@@ -87,9 +88,6 @@ WARNING
           log "assets_precompile", :status => "success"
           puts "Asset precompilation completed (#{"%.2f" % precompile.time}s)"
 
-          puts "Cleaning assets"
-          rake.task("assets:clean").invoke(env: rake_env)
-
           cleanup_assets_cache
           save_assets_cache
         else
@@ -97,6 +95,10 @@ WARNING
         end
       end
     end
+  end
+
+  def clear_assets_if_oversize
+    topic('Cleared cached assets') if @cache.clear_if_oversize(public_assets_folder, 1024)
   end
 
   def load_assets_cache

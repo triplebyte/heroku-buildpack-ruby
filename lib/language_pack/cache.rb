@@ -15,6 +15,23 @@ class LanguagePack::Cache
     target.exist? && target.rmtree
   end
 
+  # removes the path from cache if it's bigger than size
+  def clear_if_oversize(path, size)
+    target = (@cache_base + path)
+    return false if !target.exists?
+
+    # Get the size of target in kb
+    target_size = `du -sk #{target}`.first
+    return false if size.nil?
+
+    if target_size * 1024 > size
+      clear(path)
+      return true
+    end
+
+    false
+  end
+
   # Overwrite cache contents
   # When called the cache destination will be cleared and the new contents coppied over
   # This method is perferable as LanguagePack::Cache#add can cause accidental cache bloat.
@@ -53,12 +70,6 @@ class LanguagePack::Cache
   def copy(from, to, options='-a')
     return false unless File.exist?(from)
     FileUtils.mkdir_p File.dirname(to)
-    puts "----------------- copying files ----------------"
-    puts "PWD #{`pwd`}"
-    puts "Base: #{@cache_base}"
-    puts "From: #{from}"
-    puts "To: #{to}"
-    puts "------------------------------------------------"
     system("cp #{options} #{from}/. #{to}")
   end
 
