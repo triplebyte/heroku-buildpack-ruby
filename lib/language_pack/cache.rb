@@ -53,6 +53,10 @@ class LanguagePack::Cache
   def copy(from, to, options='-a')
     return false unless File.exist?(from)
     FileUtils.mkdir_p File.dirname(to)
+    puts "----------------- copying files ----------------"
+    puts "From: #{from}"
+    puts "To: #{to}"
+    puts "------------------------------------------------"
     system("cp #{options} #{from}/. #{to}")
   end
 
