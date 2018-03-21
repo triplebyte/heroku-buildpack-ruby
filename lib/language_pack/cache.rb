@@ -21,7 +21,7 @@ class LanguagePack::Cache
     return false if !target.exist?
 
     # Get the size of target in kb
-    target_size = `du -sk #{target}`.first
+    target_size = `du -sk #{target}`.split.first
     return false if size.nil?
 
     if target_size * 1024 > size
