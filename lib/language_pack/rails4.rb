@@ -79,7 +79,7 @@ WARNING
 
         topic("Preparing app for Rails asset pipeline")
 
-        clear_assets_cache_if_oversize
+        clear_assets_if_oversize
         load_assets_cache
 
         precompile.invoke(env: rake_env)
