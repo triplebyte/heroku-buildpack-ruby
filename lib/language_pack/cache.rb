@@ -18,7 +18,7 @@ class LanguagePack::Cache
   # removes the path from cache if it's bigger than size
   def clear_if_oversize(path, size)
     target = (@cache_base + path)
-    return false if !target.exists?
+    return false if !target.exist?
 
     # Get the size of target in kb
     target_size = `du -sk #{target}`.first
