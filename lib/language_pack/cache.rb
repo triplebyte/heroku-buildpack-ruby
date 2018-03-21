@@ -22,8 +22,9 @@ class LanguagePack::Cache
 
     # Get the size of target in kb
     target_size = `du -sk #{target}`.split.first
-    return false if size.nil?
+    return false if target_size.nil?
 
+    target_size = target_size.to_i
     if target_size * 1024 > size
       clear(path)
       return true
