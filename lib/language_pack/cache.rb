@@ -54,6 +54,8 @@ class LanguagePack::Cache
     return false unless File.exist?(from)
     FileUtils.mkdir_p File.dirname(to)
     puts "----------------- copying files ----------------"
+    puts "PWD #{`pwd`}"
+    puts "Base: #{@cache_base}"
     puts "From: #{from}"
     puts "To: #{to}"
     puts "------------------------------------------------"
