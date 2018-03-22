@@ -3,7 +3,8 @@ require "language_pack/rails3"
 
 # Rails 4 Language Pack. This is for all Rails 4.x apps.
 class LanguagePack::Rails4 < LanguagePack::Rails3
-  ASSETS_CACHE_LIMIT = 52428800 # bytes
+  ASSETS_CACHE_LIMIT = 52428800         # in bytes, 50M
+  ASSETS_FILES_CACHE_LIMIT = 104857600  # in bytes, 100M
 
   # detects if this is a Rails 4.x app
   # @return [Boolean] true if it's a Rails 4.x app
@@ -98,7 +99,7 @@ WARNING
   end
 
   def clear_assets_if_oversize
-    topic('Cleared cached assets') if @cache.clear_if_oversize(public_assets_folder, 1024)
+    topic('Cleared cached assets') if @cache.clear_if_oversize(public_assets_folder, ASSETS_FILES_CACHE_LIMIT)
   end
 
   def load_assets_cache

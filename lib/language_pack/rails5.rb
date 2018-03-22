@@ -3,6 +3,9 @@ require "language_pack"
 require "language_pack/rails42"
 
 class LanguagePack::Rails5 < LanguagePack::Rails42
+  WEBPACK_FILES_CACHE_LIMIT = 104857600   # in bytes, 100M
+  NODE_MODULES_CACHE_LIMIT = 314572800    # in bytes, 300M
+
   # @return [Boolean] true if it's a Rails 5.x app
   def self.use?
     instrument "rails5.use" do
@@ -59,7 +62,8 @@ class LanguagePack::Rails5 < LanguagePack::Rails42
 
   def clear_assets_if_oversize
     super
-    topic('Cleared cached packs') if @cache.clear_if_oversize(webpacker_assets_folder, 1024)
+    topic('Cleared cached packs.') if @cache.clear_if_oversize(webpacker_assets_folder, WEBPACK_FILES_CACHE_LIMIT)
+    topic('Cleared cached node modules.') if @cache.clear_if_oversize(webpacker_bundles, 1024)
   end
 
   def cleanup_assets_cache
