@@ -63,7 +63,7 @@ class LanguagePack::Rails5 < LanguagePack::Rails42
   def clear_assets_if_oversize
     super
     topic('Cleared cached packs.') if @cache.clear_if_oversize(webpacker_assets_folder, WEBPACK_FILES_CACHE_LIMIT)
-    topic('Cleared cached node modules.') if @cache.clear_if_oversize(webpacker_bundles, 1024)
+    topic('Cleared cached node modules.') if @cache.clear_if_oversize(webpacker_bundles, NODE_MODULES_CACHE_LIMIT)
   end
 
   def cleanup_assets_cache
