@@ -3,7 +3,8 @@ require "language_pack/rails3"
 
 # Rails 4 Language Pack. This is for all Rails 4.x apps.
 class LanguagePack::Rails4 < LanguagePack::Rails3
-  ASSETS_CACHE_LIMIT = 52428800 # bytes
+  ASSETS_CACHE_LIMIT = 104857600         # in bytes, 100M
+  ASSETS_FILES_CACHE_LIMIT = 104857600   # in bytes, 100M
 
   # detects if this is a Rails 4.x app
   # @return [Boolean] true if it's a Rails 4.x app
@@ -79,8 +80,8 @@ WARNING
 
         topic("Preparing app for Rails asset pipeline")
 
-        @cache.load_without_overwrite public_assets_folder
-        @cache.load default_assets_cache
+        clear_assets_if_oversize
+        load_assets_cache
 
         precompile.invoke(env: rake_env)
 
@@ -88,17 +89,27 @@ WARNING
           log "assets_precompile", :status => "success"
           puts "Asset precompilation completed (#{"%.2f" % precompile.time}s)"
 
-          puts "Cleaning assets"
-          rake.task("assets:clean").invoke(env: rake_env)
-
           cleanup_assets_cache
-          @cache.store public_assets_folder
-          @cache.store default_assets_cache
+          save_assets_cache
         else
           precompile_fail(precompile.output)
         end
       end
     end
+  end
+
+  def clear_assets_if_oversize
+    topic('Cleared cached assets') if @cache.clear_if_oversize(public_assets_folder, ASSETS_FILES_CACHE_LIMIT)
+  end
+
+  def load_assets_cache
+    @cache.load_without_overwrite public_assets_folder
+    @cache.load default_assets_cache
+  end
+
+  def save_assets_cache
+    @cache.store public_assets_folder
+    @cache.store default_assets_cache
   end
 
   def cleanup_assets_cache
