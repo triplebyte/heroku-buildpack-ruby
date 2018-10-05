@@ -108,9 +108,13 @@ WARNING
         install_binaries
         run_assets_precompile_rake_task
       end
+      config_detect
       best_practice_warnings
       super
     end
+  end
+
+  def config_detect
   end
 
 private
@@ -376,6 +380,41 @@ WARNING
 
     true
   rescue LanguagePack::Fetcher::FetchError => error
+    if stack == "heroku-18" && ruby_version.version_for_download.match?(/ruby-2\.(2|3)/)
+      message = <<ERROR
+An error occurred while installing #{ruby_version.version_for_download}
+
+This version of Ruby is not available on Heroku-18. The minimum supported version
+of Ruby on the Heroku-18 stack can found at:
+
+  https://devcenter.heroku.com/articles/ruby-support#supported-runtimes
+
+ERROR
+
+      ci_message = <<ERROR
+
+If you did not intend to build your app for CI on the Heroku-18 stack
+please set your stack version manually in the `app.json`:
+
+```
+"stack": "heroku-16"
+```
+
+More information about this change in behavior can be found at:
+  https://help.heroku.com/3Y1HEXGJ/why-doesn-t-ruby-2-3-7-work-in-my-ci-tests
+
+ERROR
+
+      if env("CI")
+        mcount "fail.bad_version_fetch.heroku-18.ci"
+        message << ci_message
+      else
+        mcount "fail.bad_version_fetch.heroku-18"
+      end
+
+      error message
+    end
+
     mcount "fail.bad_version_fetch"
     mcount "fail.bad_version_fetch.#{ruby_version.version_for_download}"
     message = <<ERROR
@@ -428,7 +467,7 @@ ERROR
   # setup the environment so we can use the vendored ruby
   def setup_ruby_install_env
     instrument 'ruby.setup_ruby_install_env' do
-      ENV["PATH"] = "#{ruby_install_binstub_path}:#{ENV["PATH"]}"
+      ENV["PATH"] = "#{File.expand_path(ruby_install_binstub_path)}:#{ENV["PATH"]}"
 
       if ruby_version.jruby?
         ENV['JAVA_OPTS']  = default_java_opts
@@ -518,6 +557,12 @@ ERROR
   # install libyaml into the LP to be referenced for psych compilation
   # @param [String] tmpdir to store the libyaml files
   def install_libyaml(dir)
+    case stack
+    when "cedar-14", "heroku-16"
+    else
+      return
+    end
+
     instrument 'ruby.install_libyaml' do
       FileUtils.mkdir_p dir
       Dir.chdir(dir) do
@@ -642,8 +687,10 @@ WARNING
             "NOKOGIRI_USE_SYSTEM_LIBRARIES" => "true",
             "BUNDLE_DISABLE_VERSION_CHECK"  => "true"
           }
-          env_vars["JAVA_HOME"] = noshellescape("#{pwd}/$JAVA_HOME") if ruby_version.jruby?
-          env_vars["BUNDLER_LIB_PATH"] = "#{bundler_path}" if ruby_version.ruby_version == "1.8.7"
+          env_vars["JAVA_HOME"]                    = noshellescape("#{pwd}/$JAVA_HOME") if ruby_version.jruby?
+          env_vars["BUNDLER_LIB_PATH"]             = "#{bundler_path}" if ruby_version.ruby_version == "1.8.7"
+          env_vars["BUNDLE_DISABLE_VERSION_CHECK"] = "true"
+
           puts "Running: #{bundle_command}"
           instrument "ruby.bundle_install" do
             bundle_time = Benchmark.realtime do
