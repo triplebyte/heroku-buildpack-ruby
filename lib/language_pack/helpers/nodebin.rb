@@ -21,7 +21,7 @@ class LanguagePack::Helpers::Nodebin
   end
 
   def self.hardcoded_yarn(version = nil)
-    version ||= '1.12.3'
+    version ||= '1.3.2'
     {
       "number" => version,
       "url"    => "https://s3.amazonaws.com/heroku-nodejs-bins/yarn/release/yarn-v#{version}.tar.gz"
