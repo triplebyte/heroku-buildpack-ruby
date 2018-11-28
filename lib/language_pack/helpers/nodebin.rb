@@ -16,7 +16,7 @@ class LanguagePack::Helpers::Nodebin
     version ||= '10.14.0'
     {
       "number" => version,
-      "url"    => "https://s3.amazonaws.com/heroku-nodejs-bins/node/release/linux-x64/node-v#{version}-linux-x64.tar.gz"
+      "url"    => "https://nodejs.org/dist/v#{version}/node-v#{version}-linux-x64.tar.gz"
     }
   end
 
