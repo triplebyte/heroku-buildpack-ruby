@@ -2,7 +2,7 @@ require 'json'
 
 class LanguagePack::Helpers::Nodebin
   def self.hardcoded_node_lts(version = nil)
-    version = "10.15.3"
+    version = "10.14.0"
     {
       "number" => version,
       "url"    => "https://s3.amazonaws.com/heroku-nodebin/node/release/linux-x64/node-v#{version}-linux-x64.tar.gz"
@@ -10,7 +10,7 @@ class LanguagePack::Helpers::Nodebin
   end
 
   def self.hardcoded_yarn(version = nil)
-    version ||= "1.16.0"
+    version ||= "1.3.2"
     {
       "number" => version,
       "url"    => "https://s3.amazonaws.com/heroku-nodebin/yarn/release/yarn-v#{version}.tar.gz"
