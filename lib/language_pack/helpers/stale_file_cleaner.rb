@@ -11,7 +11,9 @@ class LanguagePack::Helpers::StaleFileCleaner
   end
 
   def glob
-    "#{@dir}/**/*"
+    dir = @dir
+    dir = "{#{dir.join(',')}}" if dir.is_a?(Array)
+    "#{dir}/**/*"
   end
 
   def files

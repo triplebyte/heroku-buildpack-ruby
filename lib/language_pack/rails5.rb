@@ -3,6 +3,9 @@ require "language_pack"
 require "language_pack/rails42"
 
 class LanguagePack::Rails5 < LanguagePack::Rails42
+  WEBPACK_FILES_CACHE_LIMIT = 104857600   # in bytes, 100M
+  NODE_MODULES_CACHE_LIMIT = 314572800    # in bytes, 300M
+
   # @return [Boolean] true if it's a Rails 5.x app
   def self.use?
     instrument "rails5.use" do
@@ -25,6 +28,47 @@ class LanguagePack::Rails5 < LanguagePack::Rails42
     super.merge({
       "RAILS_LOG_TO_STDOUT" => "enabled"
     })
+  end
+
+  def webpacker_assets_folder
+    "public/packs"
+  end
+
+  def webpacker_assets_cache
+    "node_modules/.cache"
+  end
+
+  def webpacker_bundles
+    "node_modules"
+  end
+
+  def load_assets_cache
+    super
+    @cache.load_without_overwrite webpacker_assets_folder
+    @cache.load webpacker_assets_cache
+    @cache.load_without_overwrite webpacker_bundles
+  end
+
+  def save_assets_cache
+    super
+    @cache.store webpacker_bundles
+    @cache.store webpacker_assets_folder
+    @cache.store webpacker_assets_cache
+  end
+
+  def clear_assets_if_oversize
+    super
+    topic('Cleared cached packs.') if @cache.clear_if_oversize(webpacker_assets_folder, WEBPACK_FILES_CACHE_LIMIT)
+    topic('Cleared cached node modules.') if @cache.clear_if_oversize(webpacker_bundles, NODE_MODULES_CACHE_LIMIT)
+  end
+
+  def cleanup_assets_cache
+    instrument "rails5.cleanup_assets_cache" do
+      LanguagePack::Helpers::StaleFileCleaner.new([
+        webpacker_assets_cache,
+        default_assets_cache
+      ]).clean_over(ASSETS_CACHE_LIMIT)
+    end
   end
 
   def install_plugins

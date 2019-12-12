@@ -15,6 +15,24 @@ class LanguagePack::Cache
     target.exist? && target.rmtree
   end
 
+  # removes the path from cache if it's bigger than size
+  def clear_if_oversize(path, size)
+    target = (@cache_base + path)
+    return false if !target.exist?
+
+    # Get the size of target in kb
+    target_size = `du -sk #{target}`.split.first
+    return false if target_size.nil?
+
+    target_size = target_size.to_i
+    if target_size * 1024 > size
+      clear(path)
+      return true
+    end
+
+    false
+  end
+
   # Overwrite cache contents
   # When called the cache destination will be cleared and the new contents coppied over
   # This method is perferable as LanguagePack::Cache#add can cause accidental cache bloat.
