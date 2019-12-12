@@ -35,15 +35,11 @@ class LanguagePack::Rails5 < LanguagePack::Rails42
   end
 
   def webpacker_assets_cache
-    "tmp/cache/webpacker"
+    "node_modules/.cache"
   end
 
   def webpacker_bundles
     "node_modules"
-  end
-
-  def install_plugins
-    # do not install plugins, do not call super, do not warn
   end
 
   def load_assets_cache
@@ -73,6 +69,10 @@ class LanguagePack::Rails5 < LanguagePack::Rails42
         default_assets_cache
       ]).clean_over(ASSETS_CACHE_LIMIT)
     end
+  end
+
+  def install_plugins
+    # do not install plugins, do not call super, do not warn
   end
 
   def config_detect

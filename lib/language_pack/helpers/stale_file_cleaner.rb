@@ -12,7 +12,7 @@ class LanguagePack::Helpers::StaleFileCleaner
 
   def glob
     dir = @dir
-    dir = "{#{dir.join(',')}}" if Array === dir
+    dir = "{#{dir.join(',')}}" if dir.is_a?(Array)
     "#{dir}/**/*"
   end
 
